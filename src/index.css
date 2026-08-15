@@ -1,8 +1,9 @@
-:root {
-  --red: #CC0000;
-  --red-shadow: rgba(204, 0, 0, 0.15);
-  --black: #000;
-  --white: #fafafa;
+@import "tailwindcss";
+
+@theme {
+  --color-red: #CC0000;
+  --color-bg: #fafafa;
+  --color-text: #000;
 }
 
 * {

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Images, RotateCcw, Zap, Check } from 'lucide-react';
+import confetti from 'canvas-confetti';
 import { supabase } from '../lib/supabase';
 import { compressImage, generateFileName } from '../lib/image';
 import './Camera.css';
@@ -106,7 +107,12 @@ export default function Camera() {
         if (dbError) throw dbError;
 
         playShutterAnimation();
-        playConfetti();
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ['#CC0000', '#fff', '#000'],
+        });
         setShowSuccessAnim(true);
 
         setTimeout(() => {
@@ -127,20 +133,6 @@ export default function Camera() {
     setTimeout(() => overlay.remove(), 300);
   }
 
-  function playConfetti() {
-    const symbols = ['■', '●', '▲', '✕', '◆'];
-    for (let i = 0; i < 30; i++) {
-      const confetti = document.createElement('div');
-      confetti.className = 'confetti';
-      confetti.textContent = symbols[Math.floor(Math.random() * symbols.length)];
-      confetti.style.left = Math.random() * 100 + '%';
-      confetti.style.color = i % 2 === 0 ? '#fff' : '#CC0000';
-      confetti.style.animation = `fall ${2 + Math.random() * 1}s linear`;
-      document.body.appendChild(confetti);
-
-      setTimeout(() => confetti.remove(), 3000);
-    }
-  }
 
   return (
     <div className="camera-container">

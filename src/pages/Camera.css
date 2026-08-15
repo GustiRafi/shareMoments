@@ -238,26 +238,6 @@
   }
 }
 
-.confetti {
-  position: fixed;
-  font-size: 32px;
-  z-index: 9999;
-  pointer-events: none;
-  font-weight: bold;
-  color: #fff;
-}
-
-@keyframes fall {
-  0% {
-    bottom: 100%;
-    opacity: 1;
-  }
-  100% {
-    bottom: -10%;
-    opacity: 0;
-  }
-}
-
 @media (max-width: 480px) {
   .camera-container {
     gap: 12px;

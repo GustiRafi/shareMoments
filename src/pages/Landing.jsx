@@ -1,8 +1,37 @@
 import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { Camera } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 import './Landing.css';
 
 export default function Landing() {
+  const [photos, setPhotos] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchRecentPhotos();
+  }, []);
+
+  async function fetchRecentPhotos() {
+    try {
+      const { data } = await supabase
+        .from('photos')
+        .select('id, storage_path')
+        .order('created_at', { ascending: false })
+        .limit(6);
+      setPhotos(data || []);
+    } catch (err) {
+      console.error('Failed to fetch photos:', err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function getImageUrl(storagePath) {
+    const { data } = supabase.storage.from('photos').getPublicUrl(storagePath);
+    return data.publicUrl;
+  }
+
   return (
     <div className="landing">
       <div className="landing-content">
@@ -23,9 +52,28 @@ export default function Landing() {
           JEPRET SEKARANG
         </Link>
 
-        <div className="gallery-link-small">
-          <Link to="/gallery">Lihat jepretan</Link>
-        </div>
+        {!loading && photos.length > 0 && (
+          <div className="recent-photos">
+            <div className="photos-grid">
+              {photos.map((photo) => (
+                <img
+                  key={photo.id}
+                  src={getImageUrl(photo.storage_path)}
+                  alt="Recent photo"
+                  className="photo-thumb"
+                  loading="lazy"
+                />
+              ))}
+            </div>
+            <Link to="/gallery" className="btn btn-primary">
+              LIHAT SEMUA
+            </Link>
+          </div>
+        )}
+
+        {loading && (
+          <div style={{ color: '#999', fontSize: '14px' }}>Loading photos...</div>
+        )}
 
         <div className="decorative-bottom">
           <div className="dot-accent red"></div>
