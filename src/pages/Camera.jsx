@@ -22,13 +22,6 @@ export default function Camera() {
   useEffect(() => {
     startCamera();
     return () => stopCamera();
-  }, []);
-
-  useEffect(() => {
-    if (facingMode !== 'environment') {
-      stopCamera();
-      startCamera();
-    }
   }, [facingMode]);
 
   async function startCamera() {
