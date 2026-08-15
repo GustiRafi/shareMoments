@@ -518,3 +518,182 @@
     font-size: 14px;
   }
 }
+
+/* Item Delete Button (Gallery Grid Thumbnail) */
+.item-delete-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 28px;
+  height: 28px;
+  background: var(--red, #cc0000);
+  border: 2px solid #fff;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 5;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.4);
+  transition: all 0.15s;
+}
+
+.item-delete-btn:hover {
+  background: #ff0000;
+  transform: scale(1.1);
+}
+
+.item-delete-btn:active {
+  transform: scale(0.95);
+}
+
+/* Lightbox Delete Button */
+.lightbox-delete {
+  position: absolute;
+  top: 20px;
+  left: 88px;
+  width: 56px;
+  height: 56px;
+  background: #000;
+  border: 4px solid #fff;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1002;
+  transition: all 0.15s;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.4);
+}
+
+.lightbox-delete:hover {
+  background: var(--red, #cc0000);
+}
+
+.lightbox-delete:active {
+  transform: translate(2px, 2px);
+}
+
+/* Confirmation Modal Overlay & Box */
+.delete-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+  animation: fadeIn 0.15s ease-out;
+}
+
+.delete-modal-box {
+  background: #fff;
+  border: 5px solid #000;
+  box-shadow: 10px 10px 0 rgba(0, 0, 0, 0.5);
+  padding: 24px;
+  max-width: 380px;
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.delete-modal-icon {
+  width: 54px;
+  height: 54px;
+  background: #fee2e2;
+  border: 3px solid #000;
+  color: var(--red, #cc0000);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.delete-modal-box h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #000;
+  letter-spacing: 1px;
+}
+
+.delete-modal-box p {
+  margin: 0;
+  font-size: 14px;
+  color: #555;
+  line-height: 1.4;
+}
+
+.delete-modal-actions {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.btn-modal-cancel,
+.btn-modal-delete {
+  flex: 1;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 800;
+  border: 3px solid #000;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.12s;
+}
+
+.btn-modal-cancel {
+  background: #eee;
+  color: #000;
+}
+
+.btn-modal-cancel:hover:not(:disabled) {
+  background: #ddd;
+}
+
+.btn-modal-delete {
+  background: var(--red, #cc0000);
+  color: #fff;
+}
+
+.btn-modal-delete:hover:not(:disabled) {
+  background: #e60000;
+}
+
+.btn-modal-cancel:disabled,
+.btn-modal-delete:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes popIn {
+  from { transform: scale(0.85); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@media (max-width: 480px) {
+  .lightbox-delete {
+    width: 44px;
+    height: 44px;
+    border-width: 3px;
+    top: 12px;
+    left: 64px;
+  }
+}
+

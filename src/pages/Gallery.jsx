@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, X, Loader, Download, Globe, Camera } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Loader, Download, Globe, Trash2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { isMyPhoto, removeMyPhotoId } from '../lib/ownership';
 import './Gallery.css';
 
 export default function Gallery() {
@@ -11,6 +12,8 @@ export default function Gallery() {
   const [error, setError] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [downloading, setDownloading] = useState(false);
+  const [deletingPhotoId, setDeletingPhotoId] = useState(null);
+  const [confirmDeletePhoto, setConfirmDeletePhoto] = useState(null);
 
   useEffect(() => {
     fetchPhotos();
@@ -91,6 +94,43 @@ export default function Gallery() {
     }
   }
 
+  async function handleDeletePhoto(photo) {
+    if (!photo) return;
+    setDeletingPhotoId(photo.id);
+
+    try {
+      // 1. Delete record from Supabase DB
+      const { error: dbErr } = await supabase
+        .from('photos')
+        .delete()
+        .eq('id', photo.id);
+
+      if (dbErr) throw dbErr;
+
+      // 2. Delete file from Supabase Storage
+      await supabase.storage.from('photos').remove([photo.storage_path]);
+
+      // 3. Remove ownership from LocalStorage
+      removeMyPhotoId(photo.id);
+
+      // 4. Update UI state
+      setPhotos((prev) => prev.filter((p) => p.id !== photo.id));
+
+      if (selectedIndex !== null) {
+        if (photos.length <= 1) {
+          closeLightbox();
+        } else if (selectedIndex >= photos.length - 1) {
+          setSelectedIndex(photos.length - 2);
+        }
+      }
+    } catch (err) {
+      alert(`Gagal menghapus foto: ${err.message}`);
+    } finally {
+      setDeletingPhotoId(null);
+      setConfirmDeletePhoto(null);
+    }
+  }
+
   useEffect(() => {
     function handleKeyDown(e) {
       if (selectedIndex === null) return;
@@ -165,24 +205,42 @@ export default function Gallery() {
             <span className="gallery-group-count">{group.length} foto</span>
           </div>
           <div className="gallery-grid">
-            {group.map((photo, idx) => (
-              <div
-                key={photo.id}
-                className={`gallery-item gallery-item-${idx % 3}`}
-                onClick={() => openLightbox(photos.findIndex(p => p.id === photo.id))}
-              >
-                <img
-                  src={getImageUrl(photo.storage_path)}
-                  alt={`Photo`}
-                  loading="lazy"
-                />
-              </div>
-            ))}
+            {group.map((photo, idx) => {
+              const photoIndex = photos.findIndex((p) => p.id === photo.id);
+              const owned = isMyPhoto(photo.id);
+
+              return (
+                <div
+                  key={photo.id}
+                  className={`gallery-item gallery-item-${idx % 3}`}
+                  onClick={() => openLightbox(photoIndex)}
+                >
+                  <img
+                    src={getImageUrl(photo.storage_path)}
+                    alt="Photo"
+                    loading="lazy"
+                  />
+
+                  {owned && (
+                    <button
+                      className="item-delete-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setConfirmDeletePhoto(photo);
+                      }}
+                      title="Hapus foto saya"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       ))}
 
-      {selectedIndex !== null && (
+      {selectedIndex !== null && photos[selectedIndex] && (
         <div className="lightbox">
           <div className="lightbox-overlay" onClick={closeLightbox} />
 
@@ -195,6 +253,16 @@ export default function Gallery() {
             >
               {downloading ? <Loader size={24} className="spinner" /> : <Download size={24} />}
             </button>
+
+            {isMyPhoto(photos[selectedIndex].id) && (
+              <button
+                className="lightbox-delete"
+                onClick={() => setConfirmDeletePhoto(photos[selectedIndex])}
+                title="Hapus foto saya"
+              >
+                <Trash2 size={22} />
+              </button>
+            )}
 
             <button
               className="lightbox-close"
@@ -235,6 +303,43 @@ export default function Gallery() {
           )}
         </div>
       )}
+
+      {/* Confirmation Modal for Deletion */}
+      {confirmDeletePhoto && (
+        <div className="delete-modal-overlay" onClick={() => setConfirmDeletePhoto(null)}>
+          <div className="delete-modal-box" onClick={(e) => e.stopPropagation()}>
+            <div className="delete-modal-icon">
+              <Trash2 size={28} />
+            </div>
+            <h3>Hapus Foto Ini?</h3>
+            <p>Foto akan dihapus secara permanen dari Galeri Warga.</p>
+            <div className="delete-modal-actions">
+              <button
+                className="btn-modal-cancel"
+                onClick={() => setConfirmDeletePhoto(null)}
+                disabled={deletingPhotoId === confirmDeletePhoto.id}
+              >
+                Batal
+              </button>
+              <button
+                className="btn-modal-delete"
+                onClick={() => handleDeletePhoto(confirmDeletePhoto)}
+                disabled={deletingPhotoId === confirmDeletePhoto.id}
+              >
+                {deletingPhotoId === confirmDeletePhoto.id ? (
+                  <>
+                    <Loader size={16} className="spinner" />
+                    <span>Menghapus...</span>
+                  </>
+                ) : (
+                  <span>Ya, Hapus</span>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+

@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Images, RotateCcw, Zap, Check, Globe } from 'lucide-react';
+import { ArrowLeft, Images, RotateCcw, Zap, Check, Upload, Trash2, Globe } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { supabase } from '../lib/supabase';
 import { compressImage, generateFileName } from '../lib/image';
+import { addMyPhotoId } from '../lib/ownership';
 import './Camera.css';
 
 export default function Camera() {
@@ -20,10 +21,18 @@ export default function Camera() {
   const [uploading, setUploading] = useState(false);
   const [flashOn, setFlashOn] = useState(false);
 
+  // Preview & Confirmation state
+  const [isPreviewing, setIsPreviewing] = useState(false);
+  const [previewBlob, setPreviewBlob] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState('');
+  const [previewThumbSrc, setPreviewThumbSrc] = useState('');
+
   useEffect(() => {
-    startCamera();
+    if (!isPreviewing) {
+      startCamera();
+    }
     return () => stopCamera();
-  }, [facingMode]);
+  }, [facingMode, isPreviewing]);
 
   async function startCamera() {
     try {
@@ -65,7 +74,7 @@ export default function Camera() {
     }
   }
 
-  async function capturePhoto() {
+  function capturePhoto() {
     if (uploading || !videoRef.current || !canvasRef.current) return;
 
     const canvas = canvasRef.current;
@@ -76,50 +85,84 @@ export default function Camera() {
     ctx.drawImage(video, 0, 0);
 
     const thumbSrc = canvas.toDataURL('image/jpeg', 0.3);
-    canvas.toBlob(async (blob) => {
+    canvas.toBlob((blob) => {
       if (!blob) {
-        setError('Failed to capture photo');
+        setError('Gagal mengambil foto');
         return;
       }
 
-      setUploading(true);
-      try {
-        const compressed = await compressImage(blob); // blob is PNG (lossless), compressImage encodes to WebP
-        const fileName = generateFileName();
-
-        const { error: uploadError } = await supabase.storage
-          .from('photos')
-          .upload(`photos/${fileName}`, compressed, {
-            contentType: 'image/jpeg',
-          });
-
-        if (uploadError) throw uploadError;
-
-        const { error: dbError } = await supabase.from('photos').insert({
-          storage_path: `photos/${fileName}`,
-        });
-
-        if (dbError) throw dbError;
-
-        playShutterAnimation();
-        playFlyAnimation(thumbSrc);
-        confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: { y: 0.6 },
-          colors: ['#CC0000', '#fff', '#000'],
-        });
-        setShowSuccessAnim(true);
-
-        setTimeout(() => {
-          setShowSuccessAnim(false);
-          setUploading(false);
-        }, 2000);
-      } catch (err) {
-        setError(`Upload failed: ${err.message}`);
-        setUploading(false);
-      }
+      playShutterAnimation();
+      const url = URL.createObjectURL(blob);
+      setPreviewBlob(blob);
+      setPreviewUrl(url);
+      setPreviewThumbSrc(thumbSrc);
+      setIsPreviewing(true);
+      stopCamera();
     }, 'image/png');
+  }
+
+  function retakePhoto() {
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    setPreviewBlob(null);
+    setPreviewUrl('');
+    setPreviewThumbSrc('');
+    setIsPreviewing(false);
+    setError('');
+  }
+
+  async function confirmAndUpload() {
+    if (!previewBlob || uploading) return;
+
+    setUploading(true);
+    setError('');
+
+    try {
+      const compressed = await compressImage(previewBlob);
+      const fileName = generateFileName();
+
+      const { error: uploadError } = await supabase.storage
+        .from('photos')
+        .upload(`photos/${fileName}`, compressed, {
+          contentType: 'image/jpeg',
+        });
+
+      if (uploadError) throw uploadError;
+
+      const { data: dbData, error: dbError } = await supabase
+        .from('photos')
+        .insert({
+          storage_path: `photos/${fileName}`,
+        })
+        .select();
+
+      if (dbError) throw dbError;
+
+      // Save ID to localStorage ownership
+      if (dbData && dbData[0]?.id) {
+        addMyPhotoId(dbData[0].id);
+      }
+
+      // Play confetti & animations after confirmation
+      playFlyAnimation(previewThumbSrc);
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#CC0000', '#fff', '#000'],
+      });
+      setShowSuccessAnim(true);
+
+      setTimeout(() => {
+        setShowSuccessAnim(false);
+        setUploading(false);
+        navigate('/gallery');
+      }, 1500);
+    } catch (err) {
+      setError(`Upload gagal: ${err.message}`);
+      setUploading(false);
+    }
   }
 
   function playShutterAnimation() {
@@ -169,26 +212,20 @@ export default function Camera() {
     ).onfinish = () => el.remove();
   }
 
-
   return (
     <div className="camera-container">
       <div className="camera-header">
         <button onClick={() => navigate('/')} className="nav-btn back-btn" title="Kembali">
           <ArrowLeft size={20} />
         </button>
-        <span className="camera-label">KAMERA</span>
+        <span className="camera-label">{isPreviewing ? 'PREVIEW FOTO' : 'KAMERA'}</span>
         <button ref={galleryBtnRef} onClick={() => navigate('/gallery')} className="nav-btn gallery-btn" title="Lihat galeri">
           <Images size={20} />
         </button>
       </div>
 
-      {/* <div className="camera-public-tag">
-        <Globe size={13} />
-        <span>Foto yang kamu jepret akan tampil publik di Galeri Warga</span>
-      </div> */}
-
       <div className="camera-wrapper">
-        {!error && (
+        {!isPreviewing && !error && (
           <video
             ref={videoRef}
             autoPlay
@@ -197,51 +234,90 @@ export default function Camera() {
           />
         )}
 
+        {isPreviewing && previewUrl && (
+          <img src={previewUrl} alt="Preview" className="camera-video preview-img" />
+        )}
+
         {error && <div className="camera-error">{error}</div>}
 
         <canvas ref={canvasRef} style={{ display: 'none' }} />
       </div>
 
-      {!error && (
-        <div className="camera-controls">
-          <button
-            onClick={toggleFlash}
-            className={`control-btn flash-btn ${flashOn ? 'active' : ''}`}
-            title={flashOn ? 'Flash on' : 'Flash off'}
-          >
-            <Zap size={22} />
-          </button>
+      {isPreviewing ? (
+        <div className="preview-confirmation-panel">
+          <div className="preview-notice">
+            <Globe size={16} className="notice-icon" />
+            <span>Foto ini akan dipublikasikan ke Galeri Warga. Kamu dapat menghapusnya nanti dari perangkat ini.</span>
+          </div>
 
-          <div className="shutter-wrapper">
-            {showSuccessAnim && (
-              <span className="success-spark">
-                <Check size={18} />
-              </span>
-            )}
+          <div className="preview-actions">
             <button
-              onClick={capturePhoto}
+              onClick={retakePhoto}
               disabled={uploading}
-              className={`shutter-btn ${uploading ? 'loading' : ''}`}
-              title={uploading ? 'Uploading...' : 'Ambil foto'}
+              className="btn btn-secondary retake-btn"
+            >
+              <RotateCcw size={18} />
+              <span>Foto Ulang</span>
+            </button>
+
+            <button
+              onClick={confirmAndUpload}
+              disabled={uploading}
+              className="btn btn-primary confirm-upload-btn"
             >
               {uploading ? (
-                <span className="loading-spinner"></span>
+                <>
+                  <span className="loading-spinner"></span>
+                  <span>Mengunggah...</span>
+                </>
               ) : (
-                <span className="shutter-icon">●</span>
+                <>
+                  <Upload size={18} />
+                  <span>Unggah Foto</span>
+                </>
               )}
             </button>
           </div>
-
-          <button
-            onClick={() => setFacingMode(facingMode === 'environment' ? 'user' : 'environment')}
-            className="control-btn flip-btn"
-            disabled={uploading}
-            title="Tukar kamera"
-          >
-            <RotateCcw size={22} />
-          </button>
         </div>
+      ) : (
+        !error && (
+          <div className="camera-controls">
+            <button
+              onClick={toggleFlash}
+              className={`control-btn flash-btn ${flashOn ? 'active' : ''}`}
+              title={flashOn ? 'Flash on' : 'Flash off'}
+            >
+              <Zap size={22} />
+            </button>
+
+            <div className="shutter-wrapper">
+              {showSuccessAnim && (
+                <span className="success-spark">
+                  <Check size={18} />
+                </span>
+              )}
+              <button
+                onClick={capturePhoto}
+                disabled={uploading}
+                className={`shutter-btn ${uploading ? 'loading' : ''}`}
+                title="Ambil foto"
+              >
+                <span className="shutter-icon">●</span>
+              </button>
+            </div>
+
+            <button
+              onClick={() => setFacingMode(facingMode === 'environment' ? 'user' : 'environment')}
+              className="control-btn flip-btn"
+              disabled={uploading}
+              title="Tukar kamera"
+            >
+              <RotateCcw size={22} />
+            </button>
+          </div>
+        )
       )}
     </div>
   );
 }
+

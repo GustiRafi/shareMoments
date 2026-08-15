@@ -312,3 +312,82 @@
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
   }
 }
+
+/* Preview & Confirmation Panel Styles */
+.preview-img {
+  object-fit: cover;
+}
+
+.preview-confirmation-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  z-index: 10;
+}
+
+.preview-notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 10px 14px;
+  border-radius: 8px;
+  line-height: 1.4;
+}
+
+.preview-notice .notice-icon {
+  flex-shrink: 0;
+  color: #ff3333;
+}
+
+.preview-actions {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.preview-actions .btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 3px solid #fff;
+  transition: all 0.15s;
+}
+
+.retake-btn {
+  background: #222;
+  color: #fff;
+}
+
+.retake-btn:hover {
+  background: #333;
+}
+
+.confirm-upload-btn {
+  background: var(--red, #cc0000);
+  color: #fff;
+  border-color: var(--red, #cc0000) !important;
+}
+
+.confirm-upload-btn:hover {
+  background: #e60000;
+}
+
+.preview-actions .btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
