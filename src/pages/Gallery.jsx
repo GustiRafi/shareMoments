@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ChevronLeft, ChevronRight, X, Loader } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import './Gallery.css';
 
@@ -72,7 +73,10 @@ export default function Gallery() {
   if (loading) {
     return (
       <div className="gallery">
-        <div className="gallery-loader">⏳ Loading...</div>
+        <div className="gallery-loader">
+          <Loader className="spinner" size={40} />
+          <p>Loading jepretan...</p>
+        </div>
       </div>
     );
   }
@@ -83,7 +87,7 @@ export default function Gallery() {
         <div className="gallery-error">
           <p>{error}</p>
           <button onClick={() => navigate('/')} className="back-link">
-            ← Kembali
+            Kembali
           </button>
         </div>
       </div>
@@ -94,9 +98,10 @@ export default function Gallery() {
     return (
       <div className="gallery">
         <div className="gallery-empty">
-          <p>Belum ada foto.</p>
+          <p className="empty-title">Belum ada yang jepret.</p>
+          <p className="empty-subtitle">Jadilah orang pertama.</p>
           <button onClick={() => navigate('/camera')} className="btn btn-primary">
-            AMBIL FOTO PERTAMA
+            JEPRET SEKARANG
           </button>
         </div>
       </div>
@@ -106,9 +111,9 @@ export default function Gallery() {
   return (
     <div className="gallery">
       <div className="gallery-header">
-        <h2>GALERI FOTO</h2>
+        <h2>JEPRETAN WARGA</h2>
         <button onClick={() => navigate('/')} className="back-link">
-          ← Kembali
+          Kembali
         </button>
       </div>
 
@@ -116,7 +121,7 @@ export default function Gallery() {
         {photos.map((photo, idx) => (
           <div
             key={photo.id}
-            className="gallery-item"
+            className={`gallery-item gallery-item-${idx % 3}`}
             onClick={() => openLightbox(idx)}
           >
             <img
@@ -138,7 +143,7 @@ export default function Gallery() {
               onClick={closeLightbox}
               title="Close"
             >
-              ✕
+              <X size={28} />
             </button>
 
             <img
@@ -155,9 +160,9 @@ export default function Gallery() {
             <button
               className="lightbox-nav lightbox-prev"
               onClick={prevPhoto}
-              title="Previous photo (←)"
+              title="Previous photo"
             >
-              ‹
+              <ChevronLeft size={32} />
             </button>
           )}
 
@@ -165,9 +170,9 @@ export default function Gallery() {
             <button
               className="lightbox-nav lightbox-next"
               onClick={nextPhoto}
-              title="Next photo (→)"
+              title="Next photo"
             >
-              ›
+              <ChevronRight size={32} />
             </button>
           )}
         </div>

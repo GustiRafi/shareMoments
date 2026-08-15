@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, Images, RotateCcw, Zap } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { compressImage, generateFileName } from '../lib/image';
 import './Camera.css';
@@ -130,10 +131,11 @@ export default function Camera() {
     const container = document.querySelector('.camera-container');
     if (!container) return;
 
+    const symbols = ['■', '●', '▲', '✕', '◆'];
     for (let i = 0; i < 30; i++) {
       const confetti = document.createElement('div');
       confetti.className = 'confetti';
-      confetti.textContent = ['🎉', '📸', '🇮🇩', '⭐', '🎊'][Math.floor(Math.random() * 5)];
+      confetti.textContent = symbols[Math.floor(Math.random() * symbols.length)];
       confetti.style.left = Math.random() * 100 + '%';
       confetti.style.animation = `fall ${2 + Math.random() * 1}s linear`;
       container.appendChild(confetti);
@@ -145,11 +147,12 @@ export default function Camera() {
   return (
     <div className="camera-container">
       <div className="camera-header">
-        <button onClick={() => navigate('/')} className="back-btn">
-          ← Kembali
+        <button onClick={() => navigate('/')} className="nav-btn back-btn" title="Kembali">
+          <ArrowLeft size={20} />
         </button>
-        <button onClick={() => navigate('/gallery')} className="gallery-btn">
-          Galeri →
+        <span className="camera-label">KAMERA</span>
+        <button onClick={() => navigate('/gallery')} className="nav-btn gallery-btn" title="Lihat galeri">
+          <Images size={20} />
         </button>
       </div>
 
@@ -167,35 +170,39 @@ export default function Camera() {
 
         <canvas ref={canvasRef} style={{ display: 'none' }} />
 
-        {success && <div className="success-message">Foto terkirim! 📸</div>}
+        {success && <div className="success-message">Jepret! Foto udah masuk.</div>}
       </div>
 
       {!error && (
         <div className="camera-controls">
           <button
             onClick={toggleFlash}
-            className={`control-btn ${flashOn ? 'active' : ''}`}
-            title="Toggle flash"
+            className={`control-btn flash-btn ${flashOn ? 'active' : ''}`}
+            title={flashOn ? 'Flash on' : 'Flash off'}
           >
-            💡
+            <Zap size={22} />
           </button>
 
           <button
             onClick={capturePhoto}
             disabled={uploading}
             className={`shutter-btn ${uploading ? 'loading' : ''}`}
-            title={uploading ? 'Uploading...' : 'Take photo'}
+            title={uploading ? 'Uploading...' : 'Ambil foto'}
           >
-            {uploading ? '⏳' : '●'}
+            {uploading ? (
+              <span className="loading-spinner"></span>
+            ) : (
+              <span className="shutter-icon">●</span>
+            )}
           </button>
 
           <button
             onClick={() => setFacingMode(facingMode === 'environment' ? 'user' : 'environment')}
             className="control-btn flip-btn"
             disabled={uploading}
-            title="Switch camera"
+            title="Tukar kamera"
           >
-            ↻
+            <RotateCcw size={22} />
           </button>
         </div>
       )}

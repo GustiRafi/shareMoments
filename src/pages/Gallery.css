@@ -11,7 +11,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 32px;
-  border-bottom: 4px solid var(--red);
+  border-bottom: 5px solid #000;
   padding-bottom: 16px;
 }
 
@@ -20,24 +20,32 @@
   font-weight: 900;
   letter-spacing: 2px;
   margin: 0;
-  color: var(--red);
+  color: #000;
+  text-transform: uppercase;
 }
 
 .back-link {
   background: none;
   border: none;
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 700;
   cursor: pointer;
-  color: var(--red);
+  color: #000;
   text-decoration: underline;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 4px;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.back-link:active {
+  opacity: 0.7;
 }
 
 .gallery-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  grid-auto-rows: 160px;
   gap: 16px;
   flex-grow: 1;
 }
@@ -45,17 +53,29 @@
 .gallery-item {
   position: relative;
   overflow: hidden;
-  aspect-ratio: 1;
-  border: 3px solid var(--red);
-  box-shadow: 4px 4px 0 var(--red-shadow);
+  border: 5px solid #000;
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.15);
   cursor: pointer;
   transition: all 0.2s;
   background: #fff;
+  animation: slideIn 0.4s ease-out;
 }
 
 .gallery-item:active {
-  transform: translate(2px, 2px);
-  box-shadow: 2px 2px 0 rgba(204, 0, 0, 0.1);
+  transform: translate(3px, 3px);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.08);
+}
+
+.gallery-item-0 {
+  transform: rotate(-1deg);
+}
+
+.gallery-item-1 {
+  transform: rotate(0.5deg);
+}
+
+.gallery-item-2 {
+  transform: rotate(-0.5deg);
 }
 
 .gallery-item img {
@@ -63,6 +83,17 @@
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .gallery-loader,
@@ -78,14 +109,38 @@
   font-size: 18px;
 }
 
+.gallery-loader {
+  color: #000;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 .gallery-empty {
-  font-size: 20px;
+  font-size: 18px;
+}
+
+.empty-title {
+  font-size: 22px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.empty-subtitle {
+  font-size: 16px;
   font-weight: 600;
+  color: #666;
 }
 
 .gallery-error p {
   font-size: 16px;
-  color: #d32f2f;
+  color: var(--red);
   max-width: 400px;
 }
 
@@ -102,6 +157,7 @@
   position: absolute;
   inset: 0;
   background: rgba(0, 0, 0, 0.95);
+  cursor: pointer;
 }
 
 .lightbox-content {
@@ -118,7 +174,7 @@
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
-  border: 4px solid #fff;
+  border: 5px solid #fff;
   box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
 }
 
@@ -126,22 +182,24 @@
   position: absolute;
   top: 20px;
   right: 20px;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.9);
-  border: 3px solid #fff;
-  font-size: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 0;
+  background: #fff;
+  border: 4px solid #fff;
+  color: #000;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1002;
-  transition: all 0.2s;
+  transition: all 0.15s;
+  flex-shrink: 0;
 }
 
 .lightbox-close:active {
-  transform: scale(0.9);
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .lightbox-counter {
@@ -149,37 +207,40 @@
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.9);
   color: #fff;
-  padding: 8px 16px;
-  border-radius: 4px;
+  padding: 10px 20px;
+  border: 3px solid #fff;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   z-index: 1002;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .lightbox-nav {
   position: fixed;
   top: 50%;
   transform: translateY(-50%);
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: var(--red);
-  border: 3px solid #fff;
-  font-size: 32px;
+  width: 56px;
+  height: 56px;
+  border-radius: 0;
+  background: #fff;
+  border: 4px solid #fff;
+  color: #000;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1002;
-  transition: all 0.2s;
-  color: #fff;
+  transition: all 0.15s;
   font-weight: 600;
+  flex-shrink: 0;
 }
 
 .lightbox-nav:active {
-  transform: translateY(-50%) scale(0.9);
+  transform: translateY(-50%) translate(2px, 2px);
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .lightbox-prev {
@@ -192,7 +253,8 @@
 
 @media (max-width: 768px) {
   .gallery-grid {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    grid-auto-rows: 130px;
     gap: 12px;
   }
 
@@ -201,15 +263,15 @@
   }
 
   .lightbox-nav {
-    width: 40px;
-    height: 40px;
-    font-size: 24px;
+    width: 48px;
+    height: 48px;
+    border-width: 3px;
   }
 
   .lightbox-close {
-    width: 40px;
-    height: 40px;
-    font-size: 20px;
+    width: 48px;
+    height: 48px;
+    border-width: 3px;
   }
 }
 
@@ -220,6 +282,7 @@
 
   .gallery-grid {
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    grid-auto-rows: 100px;
     gap: 10px;
   }
 
@@ -227,21 +290,28 @@
     flex-direction: column;
     gap: 12px;
     align-items: flex-start;
+    margin-bottom: 24px;
+    border-bottom-width: 4px;
   }
 
   .gallery-header h2 {
     font-size: 24px;
+    letter-spacing: 1px;
+  }
+
+  .gallery-item {
+    border-width: 4px;
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.1);
   }
 
   .lightbox-content img {
-    border-width: 2px;
+    border-width: 4px;
   }
 
   .lightbox-nav {
-    width: 36px;
-    height: 36px;
-    font-size: 20px;
-    top: 50%;
+    width: 44px;
+    height: 44px;
+    border-width: 3px;
   }
 
   .lightbox-prev {
@@ -253,15 +323,24 @@
   }
 
   .lightbox-close {
-    width: 36px;
-    height: 36px;
-    font-size: 18px;
+    width: 44px;
+    height: 44px;
+    border-width: 3px;
     top: 12px;
     right: 12px;
   }
 
   .lightbox-counter {
     font-size: 12px;
-    padding: 6px 12px;
+    padding: 8px 16px;
+    border-width: 2px;
+  }
+
+  .empty-title {
+    font-size: 18px;
+  }
+
+  .empty-subtitle {
+    font-size: 14px;
   }
 }

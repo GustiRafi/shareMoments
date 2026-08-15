@@ -1,35 +1,36 @@
 import { Link } from 'react-router-dom';
+import { Camera } from 'lucide-react';
 import './Landing.css';
 
 export default function Landing() {
   return (
     <div className="landing">
       <div className="landing-content">
-        <div className="bunting">
-          {[...Array(10)].map((_, i) => (
-            <div key={i} className={`flag ${i % 2 === 0 ? 'merah' : 'putih'}`} />
-          ))}
+        <div className="decorative-top">
+          <div className="flag-accent flag-red"></div>
+          <div className="flag-accent flag-white"></div>
         </div>
 
         <div className="landing-header">
-          <div className="ornamen-flags">
-            <span>🇮🇩</span>
-          </div>
+          <div className="year-badge">81</div>
           <h1>JALAN SEHAT</h1>
           <p className="date">17 AGUSTUS 2026</p>
         </div>
 
-        <p className="tagline">
-          Abadikan momennya 📸
-          <div className="badge-year">⭐ 81 TAHUN ⭐</div>
-        </p>
+        <p className="tagline">Jepret dulu, mikir belakangan.</p>
 
         <Link to="/camera" className="btn btn-primary">
-          AMBIL FOTO
+          JEPRET SEKARANG
         </Link>
 
         <div className="gallery-link-small">
-          <Link to="/gallery">Lihat galeri</Link>
+          <Link to="/gallery">Lihat jepretan</Link>
+        </div>
+
+        <div className="decorative-bottom">
+          <div className="dot-accent red"></div>
+          <div className="dot-accent white"></div>
+          <div className="dot-accent red"></div>
         </div>
       </div>
 
