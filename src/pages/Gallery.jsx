@@ -37,6 +37,20 @@ export default function Gallery() {
     return data.publicUrl;
   }
 
+  function groupByDate(photos) {
+    const groups = {};
+    for (const photo of photos) {
+      const label = new Date(photo.created_at).toLocaleDateString('id-ID', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      });
+      (groups[label] ??= []).push(photo);
+    }
+    return Object.entries(groups);
+  }
+
   function openLightbox(index) {
     setSelectedIndex(index);
     document.body.style.overflow = 'hidden';
@@ -144,21 +158,29 @@ export default function Gallery() {
         <span><strong>DOKUMENTASI PUBLIK:</strong> Ini adalah ruang dokumentasi terbuka dari warga untuk warga. Seluruh foto di galeri ini dapat dilihat secara publik.</span>
       </div>
 
-      <div className="gallery-grid">
-        {photos.map((photo, idx) => (
-          <div
-            key={photo.id}
-            className={`gallery-item gallery-item-${idx % 3}`}
-            onClick={() => openLightbox(idx)}
-          >
-            <img
-              src={getImageUrl(photo.storage_path)}
-              alt={`Photo ${idx + 1}`}
-              loading="lazy"
-            />
+      {groupByDate(photos).map(([dateLabel, group]) => (
+        <div key={dateLabel} className="gallery-group">
+          <div className="gallery-group-header">
+            <span>{dateLabel}</span>
+            <span className="gallery-group-count">{group.length} foto</span>
           </div>
-        ))}
-      </div>
+          <div className="gallery-grid">
+            {group.map((photo, idx) => (
+              <div
+                key={photo.id}
+                className={`gallery-item gallery-item-${idx % 3}`}
+                onClick={() => openLightbox(photos.findIndex(p => p.id === photo.id))}
+              >
+                <img
+                  src={getImageUrl(photo.storage_path)}
+                  alt={`Photo`}
+                  loading="lazy"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
 
       {selectedIndex !== null && (
         <div className="lightbox">

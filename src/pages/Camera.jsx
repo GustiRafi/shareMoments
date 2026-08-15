@@ -11,6 +11,7 @@ export default function Camera() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
+  const galleryBtnRef = useRef(null);
 
   const [facingMode, setFacingMode] = useState('environment');
   const [loading, setLoading] = useState(false);
@@ -74,6 +75,7 @@ export default function Camera() {
     const ctx = canvas.getContext('2d');
     ctx.drawImage(video, 0, 0);
 
+    const thumbSrc = canvas.toDataURL('image/jpeg', 0.3);
     canvas.toBlob(async (blob) => {
       if (!blob) {
         setError('Failed to capture photo');
@@ -100,6 +102,7 @@ export default function Camera() {
         if (dbError) throw dbError;
 
         playShutterAnimation();
+        playFlyAnimation(thumbSrc);
         confetti({
           particleCount: 100,
           spread: 70,
@@ -126,6 +129,46 @@ export default function Camera() {
     setTimeout(() => overlay.remove(), 300);
   }
 
+  function playFlyAnimation(thumbSrc) {
+    const galleryBtn = galleryBtnRef.current;
+    if (!galleryBtn) return;
+
+    const { left, top, width, height } = galleryBtn.getBoundingClientRect();
+    const endX = left + width / 2;
+    const endY = top + height / 2;
+
+    const el = document.createElement('img');
+    el.src = thumbSrc;
+    el.className = 'fly-thumb';
+    document.body.appendChild(el);
+
+    el.animate(
+      [
+        {
+          left: '50%',
+          top: '75%',
+          width: '64px',
+          height: '64px',
+          opacity: 1,
+          transform: 'translate(-50%, -50%)',
+        },
+        {
+          left: `${endX}px`,
+          top: `${endY}px`,
+          width: '20px',
+          height: '20px',
+          opacity: 0,
+          transform: 'translate(-50%, -50%)',
+        },
+      ],
+      {
+        duration: 700,
+        easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+        fill: 'forwards',
+      }
+    ).onfinish = () => el.remove();
+  }
+
 
   return (
     <div className="camera-container">
@@ -134,7 +177,7 @@ export default function Camera() {
           <ArrowLeft size={20} />
         </button>
         <span className="camera-label">KAMERA</span>
-        <button onClick={() => navigate('/gallery')} className="nav-btn gallery-btn" title="Lihat galeri">
+        <button ref={galleryBtnRef} onClick={() => navigate('/gallery')} className="nav-btn gallery-btn" title="Lihat galeri">
           <Images size={20} />
         </button>
       </div>
