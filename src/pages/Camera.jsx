@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Images, RotateCcw, Zap } from 'lucide-react';
+import { ArrowLeft, Images, RotateCcw, Zap, Check } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { compressImage, generateFileName } from '../lib/image';
 import './Camera.css';
@@ -14,7 +14,7 @@ export default function Camera() {
   const [facingMode, setFacingMode] = useState('environment');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
+  const [showSuccessAnim, setShowSuccessAnim] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [flashOn, setFlashOn] = useState(false);
 
@@ -107,10 +107,10 @@ export default function Camera() {
 
         playShutterAnimation();
         playConfetti();
-        setSuccess(true);
+        setShowSuccessAnim(true);
 
         setTimeout(() => {
-          setSuccess(false);
+          setShowSuccessAnim(false);
           setUploading(false);
         }, 2000);
       } catch (err) {
@@ -128,17 +128,15 @@ export default function Camera() {
   }
 
   function playConfetti() {
-    const container = document.querySelector('.camera-container');
-    if (!container) return;
-
     const symbols = ['■', '●', '▲', '✕', '◆'];
     for (let i = 0; i < 30; i++) {
       const confetti = document.createElement('div');
       confetti.className = 'confetti';
       confetti.textContent = symbols[Math.floor(Math.random() * symbols.length)];
       confetti.style.left = Math.random() * 100 + '%';
+      confetti.style.color = i % 2 === 0 ? '#fff' : '#CC0000';
       confetti.style.animation = `fall ${2 + Math.random() * 1}s linear`;
-      container.appendChild(confetti);
+      document.body.appendChild(confetti);
 
       setTimeout(() => confetti.remove(), 3000);
     }
@@ -169,8 +167,6 @@ export default function Camera() {
         {error && <div className="camera-error">{error}</div>}
 
         <canvas ref={canvasRef} style={{ display: 'none' }} />
-
-        {success && <div className="success-message">Jepret! Foto udah masuk.</div>}
       </div>
 
       {!error && (
@@ -183,18 +179,25 @@ export default function Camera() {
             <Zap size={22} />
           </button>
 
-          <button
-            onClick={capturePhoto}
-            disabled={uploading}
-            className={`shutter-btn ${uploading ? 'loading' : ''}`}
-            title={uploading ? 'Uploading...' : 'Ambil foto'}
-          >
-            {uploading ? (
-              <span className="loading-spinner"></span>
-            ) : (
-              <span className="shutter-icon">●</span>
+          <div className="shutter-wrapper">
+            {showSuccessAnim && (
+              <span className="success-spark">
+                <Check size={18} />
+              </span>
             )}
-          </button>
+            <button
+              onClick={capturePhoto}
+              disabled={uploading}
+              className={`shutter-btn ${uploading ? 'loading' : ''}`}
+              title={uploading ? 'Uploading...' : 'Ambil foto'}
+            >
+              {uploading ? (
+                <span className="loading-spinner"></span>
+              ) : (
+                <span className="shutter-icon">●</span>
+              )}
+            </button>
+          </div>
 
           <button
             onClick={() => setFacingMode(facingMode === 'environment' ? 'user' : 'environment')}
