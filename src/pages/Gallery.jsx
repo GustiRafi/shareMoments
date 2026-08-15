@@ -59,14 +59,15 @@ export default function Gallery() {
     }
   }
 
-  async function downloadPhoto(url, idx) {
+  async function downloadPhoto(url, idx, storagePath) {
     setDownloading(true);
     try {
       const res = await fetch(url);
       const blob = await res.blob();
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = `foto-warga-${idx + 1}.jpg`;
+      const ext = storagePath.split('.').pop();
+      a.download = `foto-warga-${idx + 1}.${ext}`;
       a.click();
       URL.revokeObjectURL(a.href);
     } catch (err) {
@@ -166,7 +167,7 @@ export default function Gallery() {
           <div className="lightbox-content">
             <button
               className={`lightbox-download ${downloading ? 'downloading' : ''}`}
-              onClick={() => downloadPhoto(getImageUrl(photos[selectedIndex].storage_path), selectedIndex)}
+              onClick={() => downloadPhoto(getImageUrl(photos[selectedIndex].storage_path), selectedIndex, photos[selectedIndex].storage_path)}
               disabled={downloading}
               title="Download foto"
             >

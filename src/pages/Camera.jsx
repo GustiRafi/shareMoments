@@ -82,7 +82,7 @@ export default function Camera() {
 
       setUploading(true);
       try {
-        const compressed = await compressImage(blob);
+        const compressed = await compressImage(blob); // blob is PNG (lossless), compressImage encodes to WebP
         const fileName = generateFileName();
 
         const { error: uploadError } = await supabase.storage
@@ -116,7 +116,7 @@ export default function Camera() {
         setError(`Upload failed: ${err.message}`);
         setUploading(false);
       }
-    }, 'image/jpeg', 0.8);
+    }, 'image/png');
   }
 
   function playShutterAnimation() {

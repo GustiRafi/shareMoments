@@ -27,6 +27,8 @@ export async function compressImage(blob) {
 
       canvas.width = width;
       canvas.height = height;
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
       ctx.drawImage(img, 0, 0, width, height);
 
       canvas.toBlob(
@@ -34,8 +36,8 @@ export async function compressImage(blob) {
           if (!compressed) reject(new Error('Failed to compress image'));
           else resolve(compressed);
         },
-        'image/jpeg',
-        0.8
+        'image/webp',
+        0.85
       );
     };
 
@@ -45,5 +47,5 @@ export async function compressImage(blob) {
 }
 
 export function generateFileName() {
-  return `${Date.now()}-${Math.random().toString(36).slice(2)}.jpg`;
+  return `${Date.now()}-${Math.random().toString(36).slice(2)}.webp`;
 }
