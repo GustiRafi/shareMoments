@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, X, Loader, Globe, Camera } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Loader, Download, Globe, Camera } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import './Gallery.css';
 
@@ -10,6 +10,7 @@ export default function Gallery() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(null);
+  const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
     fetchPhotos();
@@ -55,6 +56,23 @@ export default function Gallery() {
   function prevPhoto() {
     if (selectedIndex > 0) {
       setSelectedIndex(selectedIndex - 1);
+    }
+  }
+
+  async function downloadPhoto(url, idx) {
+    setDownloading(true);
+    try {
+      const res = await fetch(url);
+      const blob = await res.blob();
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `foto-warga-${idx + 1}.jpg`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    } catch (err) {
+      console.error('Download failed:', err);
+    } finally {
+      setDownloading(false);
     }
   }
 
@@ -146,6 +164,15 @@ export default function Gallery() {
           <div className="lightbox-overlay" onClick={closeLightbox} />
 
           <div className="lightbox-content">
+            <button
+              className={`lightbox-download ${downloading ? 'downloading' : ''}`}
+              onClick={() => downloadPhoto(getImageUrl(photos[selectedIndex].storage_path), selectedIndex)}
+              disabled={downloading}
+              title="Download foto"
+            >
+              {downloading ? <Loader size={24} className="spinner" /> : <Download size={24} />}
+            </button>
+
             <button
               className="lightbox-close"
               onClick={closeLightbox}
