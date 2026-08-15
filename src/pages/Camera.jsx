@@ -139,10 +139,10 @@ export default function Camera() {
         </button>
       </div>
 
-      <div className="camera-public-tag">
+      {/* <div className="camera-public-tag">
         <Globe size={13} />
         <span>Foto yang kamu jepret akan tampil publik di Galeri Warga</span>
-      </div>
+      </div> */}
 
       <div className="camera-wrapper">
         {!error && (

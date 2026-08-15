@@ -44,17 +44,19 @@ export default function Landing() {
           <div className="year-badge">81</div>
           <h1>SEMARAK AGUSTUS</h1>
           <p className="date">17 AGUSTUS 2026</p>
+          <p className="builder">Built by Gusti</p>
         </div>
 
         <div className="hero-text-card">
-          <p className="tagline">Jepret Momen Keseruan 17-an</p>
-          <p className="sub-tagline">Abadikan momen seru bersama warga. Foto yang diambil akan otomatis dipublikasikan secara umum.</p>
+          <span className="community-badge">DARI WARGA, UNTUK WARGA</span>
+          <p className="tagline">Dokumentasi Keseruan 17 Agustus</p>
+          <p className="sub-tagline">Wadah bersama untuk mengabadikan dan membagikan setiap momen seru perayaan kemerdekaan.</p>
         </div>
 
-        <div className="public-notice">
+        {/* <div className="public-notice">
           <Globe size={20} className="notice-icon" />
-          <span><strong>INFO PUBLIK:</strong> Semua foto yang kamu ambil akan otomatis tampil di Galeri Warga dan dapat dilihat oleh publik.</span>
-        </div>
+          <span><strong>INFO DOKUMENTASI PUBLIK:</strong> Ini adalah ruang dokumentasi terbuka dari warga untuk warga. Semua foto yang diambil akan langsung dipublikasikan dan dapat dilihat oleh seluruh warga.</span>
+        </div> */}
 
         <Link to="/camera" className="btn btn-primary">
           JEPRET SEKARANG
@@ -63,8 +65,8 @@ export default function Landing() {
         {!loading && photos.length > 0 && (
           <div className="recent-photos">
             <div className="section-header-card">
-              <span className="section-title">JEPRETAN TERBARU WARGA</span>
-              <p className="section-subtitle">Daftar foto terkini yang diunggah oleh warga.</p>
+              <span className="section-title">DOKUMENTASI TERBARU WARGA</span>
+              <p className="section-subtitle">Kumpulan foto momen 17-an yang diabadikan langsung oleh warga.</p>
             </div>
             <div className="photos-grid">
               {photos.map((photo) => (

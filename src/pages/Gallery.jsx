@@ -131,8 +131,8 @@ export default function Gallery() {
     <div className="gallery">
       <div className="gallery-header">
         <div className="header-text-container">
-          <h2>GALERI WARGA</h2>
-          <p className="header-subtitle">Kumpulan foto dan momen perayaan 17-an.</p>
+          <h2>GALERI DOKUMENTASI WARGA</h2>
+          <p className="header-subtitle">Dari warga, untuk warga. Arsip kebersamaan perayaan 17 Agustus.</p>
         </div>
         <button onClick={() => navigate('/')} className="back-link">
           Kembali
@@ -141,7 +141,7 @@ export default function Gallery() {
 
       <div className="gallery-notice-bar">
         <Globe size={18} className="notice-icon" />
-        <span><strong>GALERI PUBLIK:</strong> Semua foto di galeri ini dapat dilihat secara terbuka oleh publik.</span>
+        <span><strong>DOKUMENTASI PUBLIK:</strong> Ini adalah ruang dokumentasi terbuka dari warga untuk warga. Seluruh foto di galeri ini dapat dilihat secara publik.</span>
       </div>
 
       <div className="gallery-grid">
