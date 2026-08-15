@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, X, Loader } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Loader, Globe, Camera } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import './Gallery.css';
 
@@ -25,7 +25,7 @@ export default function Gallery() {
       if (fetchError) throw fetchError;
       setPhotos(data || []);
     } catch (err) {
-      setError(`Failed to load photos: ${err.message}`);
+      setError(`Gagal memuat foto: ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -75,7 +75,7 @@ export default function Gallery() {
       <div className="gallery">
         <div className="gallery-loader">
           <Loader className="spinner" size={40} />
-          <p>Loading jepretan...</p>
+          <p>Memuat jepretan warga...</p>
         </div>
       </div>
     );
@@ -98,8 +98,8 @@ export default function Gallery() {
     return (
       <div className="gallery">
         <div className="gallery-empty">
-          <p className="empty-title">Belum ada yang jepret.</p>
-          <p className="empty-subtitle">Jadilah orang pertama.</p>
+          <p className="empty-title">Belum Ada Jepretan Foto</p>
+          <p className="empty-subtitle">Jadilah orang pertama yang mengunggah momen 17-an. Foto pertamamu akan langsung tampil di sini.</p>
           <button onClick={() => navigate('/camera')} className="btn btn-primary">
             JEPRET SEKARANG
           </button>
@@ -111,10 +111,18 @@ export default function Gallery() {
   return (
     <div className="gallery">
       <div className="gallery-header">
-        <h2>JEPRETAN WARGA</h2>
+        <div className="header-text-container">
+          <h2>GALERI WARGA</h2>
+          <p className="header-subtitle">Kumpulan foto dan momen perayaan 17-an.</p>
+        </div>
         <button onClick={() => navigate('/')} className="back-link">
           Kembali
         </button>
+      </div>
+
+      <div className="gallery-notice-bar">
+        <Globe size={18} className="notice-icon" />
+        <span><strong>GALERI PUBLIK:</strong> Semua foto di galeri ini dapat dilihat secara terbuka oleh publik.</span>
       </div>
 
       <div className="gallery-grid">

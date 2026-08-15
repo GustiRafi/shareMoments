@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Images, RotateCcw, Zap, Check } from 'lucide-react';
+import { ArrowLeft, Images, RotateCcw, Zap, Check, Globe } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { supabase } from '../lib/supabase';
 import { compressImage, generateFileName } from '../lib/image';
@@ -144,6 +144,11 @@ export default function Camera() {
         <button onClick={() => navigate('/gallery')} className="nav-btn gallery-btn" title="Lihat galeri">
           <Images size={20} />
         </button>
+      </div>
+
+      <div className="camera-public-tag">
+        <Globe size={13} />
+        <span>Foto yang kamu jepret akan tampil publik di Galeri Warga</span>
       </div>
 
       <div className="camera-wrapper">

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { Camera } from 'lucide-react';
+import { Globe } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import './Landing.css';
 
@@ -42,11 +42,19 @@ export default function Landing() {
 
         <div className="landing-header">
           <div className="year-badge">81</div>
-          <h1>JALAN SEHAT</h1>
+          <h1>SEMARAK AGUSTUS</h1>
           <p className="date">17 AGUSTUS 2026</p>
         </div>
 
-        <p className="tagline">Jepret dulu, mikir belakangan.</p>
+        <div className="hero-text-card">
+          <p className="tagline">Jepret Momen Keseruan 17-an</p>
+          <p className="sub-tagline">Abadikan momen seru bersama warga. Foto yang diambil akan otomatis dipublikasikan secara umum.</p>
+        </div>
+
+        <div className="public-notice">
+          <Globe size={20} className="notice-icon" />
+          <span><strong>INFO PUBLIK:</strong> Semua foto yang kamu ambil akan otomatis tampil di Galeri Warga dan dapat dilihat oleh publik.</span>
+        </div>
 
         <Link to="/camera" className="btn btn-primary">
           JEPRET SEKARANG
@@ -54,6 +62,10 @@ export default function Landing() {
 
         {!loading && photos.length > 0 && (
           <div className="recent-photos">
+            <div className="section-header-card">
+              <span className="section-title">JEPRETAN TERBARU WARGA</span>
+              <p className="section-subtitle">Daftar foto terkini yang diunggah oleh warga.</p>
+            </div>
             <div className="photos-grid">
               {photos.map((photo) => (
                 <img
@@ -66,13 +78,13 @@ export default function Landing() {
               ))}
             </div>
             <Link to="/gallery" className="btn btn-primary">
-              LIHAT SEMUA
+              LIHAT SEMUA FOTO
             </Link>
           </div>
         )}
 
         {loading && (
-          <div style={{ color: '#999', fontSize: '14px' }}>Loading photos...</div>
+          <div className="loading-card">Memuat foto warga...</div>
         )}
 
         <div className="decorative-bottom">
